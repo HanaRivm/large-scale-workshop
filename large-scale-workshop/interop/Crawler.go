@@ -24,6 +24,10 @@ char* load_cpython()
     if (!Py_IsInitialized()) {
         return "Failed to initialize Python. Py_Initialize did not set up Python interpreter.";
     }
+    
+    // Print Python version and path
+    PyRun_SimpleString("import sys; print('Python version:', sys.version)");
+    PyRun_SimpleString("import sys; print('Python path:', sys.path)");
 
 	// Get the “path” attribute from “sys” module in Python
 	PyObject* sysPath = PySys_GetObject("path");
