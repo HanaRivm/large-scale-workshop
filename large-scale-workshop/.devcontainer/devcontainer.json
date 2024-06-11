@@ -5,8 +5,10 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "tscs/large-scale-workshop:latest",
 	"postCreateCommand": "sudo python3.11 -m pip install --no-cache-dir -r /workspaces/HANA/large-scale-workshop/interop/requirements.txt",
-	"postStartCommand": "sudo apt-get update && sudo apt-get install -y python3.11-dev"
-
+	"postStartCommand": "sudo apt-get update && sudo apt-get install -y python3.11-dev",
+	"mounts": [
+    "source=/c/Users/hanar/.ssh,target=/home/vscode/.ssh,type=bind"
+	]
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
