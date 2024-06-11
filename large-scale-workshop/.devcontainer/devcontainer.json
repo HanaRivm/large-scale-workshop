@@ -3,7 +3,10 @@
 {
 	"name": "large-scale-workshop",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "tscs/large-scale-workshop:latest"
+	"image": "tscs/large-scale-workshop:latest",
+	"postCreateCommand": "sudo python3.11 -m pip install --no-cache-dir -r /workspaces/HANA/large-scale-workshop/interop/requirements.txt",
+	"postStartCommand": "sudo apt-get update && sudo apt-get install -y python3.11-dev"
+
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
