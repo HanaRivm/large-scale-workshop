@@ -1,4 +1,4 @@
-package TestService
+package TestServiceClient
 
 import (
 	"testing"
