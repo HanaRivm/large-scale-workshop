@@ -1,10 +1,11 @@
 package TestServiceClient
 
 import (
-	services "[module name]/services/common"
-	service "[module name]/services/test-service/common"
 	context "context"
 	"fmt"
+
+	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
+	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )
