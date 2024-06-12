@@ -10,8 +10,7 @@ import (
 )
 
 func TestHelloWorld(t *testing.T) {
-	conn, err :=
-		grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		t.Fatalf("did not connect: %v", err)
 		return
