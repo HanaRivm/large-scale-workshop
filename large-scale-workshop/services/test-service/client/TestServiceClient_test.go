@@ -1,8 +1,9 @@
 package TestService
 
 import (
-	client "[module name]/services/test-service/client"
 	"testing"
+
+	client "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/client"
 )
 
 func TestHelloWorld(t *testing.T) {
