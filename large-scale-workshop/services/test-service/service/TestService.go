@@ -21,7 +21,7 @@ func (obj *testServiceImplementation) HelloWorld(ctxt context.Context, _ *emptyp
 	return wrapperspb.String(TestServiceServant.HelloWorld()), nil
 }
 
-func (obj *testServiceImplementation) HelloToUser(ctx context.Context, req *wrapperspb.StringValue) (*wrapperspb.StringValue, error) {
+func (obj *testServiceImplementation) HelloToUser(ctx context.Context, req *wrapperspb.StringValue) (res *wrapperspb.StringValue, err error) {
 	username := req.GetValue()
 	message := fmt.Sprintf("Hello %s", username)
 	return wrapperspb.String(message), nil
