@@ -5,10 +5,12 @@ import (
 	"net"
 
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
+
 	"google.golang.org/grpc"
 )
 
-func startgRPC(listenPort int) (listeningAddress string, grpcServer *grpc.Server, startListening func()) {
+func startgRPC(listenPort int) (listeningAddress string, grpcServer *grpc.Server,
+	startListening func()) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", listenPort))
 	if err != nil {
 		Logger.Fatalf("failed to listen: %v", err)

@@ -20,7 +20,6 @@ func Start(configData []byte) error {
 		RegisterTestServiceServer(s, &testServiceImplementation{})
 	}
 	services.Start("TestService", 50051, bindgRPCToService)
-	return nil
 }
 
 func (obj *testServiceImplementation) HelloWorld(_ context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {

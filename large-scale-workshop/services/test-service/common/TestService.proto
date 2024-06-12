@@ -47,4 +47,4 @@ service TestService {
  
     // returns true 
     rpc IsAlive(google.protobuf.Empty) returns (google.protobuf.BoolValue); 
-}
+} 

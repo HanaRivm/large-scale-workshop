@@ -19,10 +19,7 @@ func TestHelloWorld(t *testing.T) {
 	defer conn.Close()
 	c := common.NewTestServiceClient(conn)
 	// Call the HelloWorld RPC function
-	t.Logf(("got here 1"))
-
 	r, err := c.HelloWorld(context.Background(), &emptypb.Empty{})
-	t.Logf(("got here 2"))
 	if err != nil {
 		t.Fatalf("could not call HelloWorld: %v", err)
 		return
