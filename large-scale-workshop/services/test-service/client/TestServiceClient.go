@@ -6,7 +6,6 @@ import (
 
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
-
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
