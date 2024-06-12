@@ -5,6 +5,7 @@ import (
 
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
+	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
