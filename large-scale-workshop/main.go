@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/config"
+	TestService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/service"
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"gopkg.in/yaml.v2"
 )
@@ -31,6 +32,7 @@ func main() {
 	switch config.Type {
 	case "TestService":
 		utils.Logger.Printf("Loading service type: %v\n", config.Type)
+		TestService.Start(configData)
 
 	default:
 		utils.Logger.Fatalf("Unknown configuration type: %v", config.Type)

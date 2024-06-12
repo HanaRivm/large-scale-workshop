@@ -461,6 +461,10 @@ cleanup:
     return result;
 }
 
+char* get_string_from_array(char** arr, int index) {
+    return arr[index];
+}
+
 jboolean get_is_first_field(jobject chordObject, char** out_error)
 {
     jfieldID fieldIsFirst;
