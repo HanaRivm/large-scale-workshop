@@ -7,6 +7,7 @@ import (
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type TestServiceClient struct {
@@ -31,4 +32,15 @@ func (obj *TestServiceClient) HelloWorld() (string, error) {
 		return "", fmt.Errorf("could not call HelloWorld: %v", err)
 	}
 	return r.Value, nil
+}
+
+func (obj *TestServiceClient) HelloToUser(username string) (string, error) {
+	c, closeFunc, err := obj.Connect()
+	defer closeFunc()
+	// Call the HelloToUser RPC function
+	res, err := c.HelloToUser(context.Background(), &wrapperspb.StringValue{Value: username})
+	if err != nil {
+		return "", fmt.Errorf("could not call HelloToUser: %v", err)
+	}
+	return res.GetValue(), nil
 }
