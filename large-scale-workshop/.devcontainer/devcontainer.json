@@ -9,7 +9,6 @@
 	"mounts": [
     "source=/c/Users/hanar/.ssh,target=/home/vscode/.ssh,type=bind"
 	]
-
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
