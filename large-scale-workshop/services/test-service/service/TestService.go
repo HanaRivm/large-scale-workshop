@@ -11,6 +11,10 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+type testServiceImplementation struct {
+	UnimplementedTestServiceServer
+}
+
 func (obj *testServiceImplementation) HelloWorld(_ context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {
 	Logger.Printf("HelloWorld called")
 	return wrapperspb.String("Hello World"), nil
@@ -21,4 +25,5 @@ func Start(configData []byte) error {
 		RegisterTestServiceServer(s, &testServiceImplementation{})
 	}
 	services.Start("TestService", 50051, bindgRPCToService)
+	return nil
 }
