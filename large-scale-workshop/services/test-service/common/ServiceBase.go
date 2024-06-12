@@ -3,7 +3,7 @@ package services
 import ( 
     "fmt" 
     "net" 
-    . "large-scale-workshop/utils" 
+    . "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils" 
     "google.golang.org/grpc" 
 ) 
   
