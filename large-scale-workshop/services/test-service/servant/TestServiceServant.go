@@ -1,6 +1,10 @@
 package TestServiceServant
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
 var cacheMap map[string]string
 
@@ -23,4 +27,9 @@ func Store(key, value string) {
 func Get(key string) (string, bool) {
 	value, exists := cacheMap[key]
 	return value, exists
+}
+
+func WaitAndRand(seconds int32, sendToClient func(x int32) error) error {
+	time.Sleep(time.Duration(seconds) * time.Second)
+	return sendToClient(int32(rand.Intn(10)))
 }

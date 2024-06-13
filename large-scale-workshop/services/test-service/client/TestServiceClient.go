@@ -77,3 +77,22 @@ func (obj *TestServiceClient) Get(key string) (string, error) {
 	}
 	return res.Value, nil
 }
+
+func (obj *TestServiceClient) WaitAndRand(seconds int32) (func() (int32,
+	error), error) {
+	c, closeFunc, err := obj.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.Address,
+			err)
+	}
+	r, err := c.WaitAndRand(context.Background(), wrapperspb.Int32(seconds))
+	if err != nil {
+		return nil, fmt.Errorf("could not call Get: %v", err)
+	}
+	res := func() (int32, error) {
+		defer closeFunc()
+		x, err := r.Recv()
+		return x.Value, err
+	}
+	return res, nil
+}

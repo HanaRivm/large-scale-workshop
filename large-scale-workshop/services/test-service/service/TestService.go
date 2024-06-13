@@ -48,3 +48,11 @@ func Start(configData []byte) error {
 	services.Start("TestService", 50051, bindgRPCToService)
 	return nil
 }
+
+func (obj *testServiceImplementation) WaitAndRand(seconds *wrapperspb.Int32Value, streamRet TestService_WaitAndRandServer) error {
+	Logger.Printf("WaitAndRand called")
+	streamClient := func(x int32) error {
+		return streamRet.Send(wrapperspb.Int32(x))
+	}
+	return TestServiceServant.WaitAndRand(seconds.Value, streamClient)
+}
