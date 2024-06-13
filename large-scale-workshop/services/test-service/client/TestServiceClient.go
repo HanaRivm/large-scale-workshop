@@ -47,3 +47,33 @@ func (obj *TestServiceClient) HelloToUser(username string) (string, error) {
 	}
 	return res.Value, nil
 }
+
+func (obj *TestServiceClient) Store(key, value string) error {
+	c, closeFunc, err := obj.Connect()
+	defer closeFunc()
+	if err != nil {
+		return fmt.Errorf("failed to connect: %v", err)
+	}
+	req := &service.StoreKeyValue{
+		Key:   key,
+		Value: value,
+	}
+	_, err = c.Store(context.Background(), req)
+	if err != nil {
+		return fmt.Errorf("could not call Store: %v", err)
+	}
+	return nil
+}
+func (obj *TestServiceClient) Get(key string) (string, error) {
+	c, closeFunc, err := obj.Connect()
+	defer closeFunc()
+	if err != nil {
+		return "", fmt.Errorf("failed to connect: %v", err)
+	}
+	req := &wrapperspb.StringValue{Value: key}
+	res, err := c.Get(context.Background(), req)
+	if err != nil {
+		return "", fmt.Errorf("could not call Get: %v", err)
+	}
+	return res.Value, nil
+}
