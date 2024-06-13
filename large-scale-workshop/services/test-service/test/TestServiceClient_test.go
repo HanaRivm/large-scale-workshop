@@ -29,3 +29,23 @@ func TestHelloToUser(t *testing.T) {
 	}
 	t.Logf("Response: %v", r)
 }
+func TestStoreAndGet(t *testing.T) {
+	c := client.NewTestServiceClient("localhost:50051")
+
+	// Test Store
+	err := c.Store("key1", "value1")
+	if err != nil {
+		t.Fatalf("could not call Store: %v", err)
+	}
+
+	// Test Get
+	r, err := c.Get("key1")
+	if err != nil {
+		t.Fatalf("could not call Get: %v", err)
+	}
+	expected := "value1"
+	if r != expected {
+		t.Errorf("unexpected response: got %s, want %s", r, expected)
+	}
+	t.Logf("Response: %v", r)
+}
