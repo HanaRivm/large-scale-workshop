@@ -37,10 +37,13 @@ func (obj *TestServiceClient) HelloWorld() (string, error) {
 func (obj *TestServiceClient) HelloToUser(username string) (string, error) {
 	c, closeFunc, err := obj.Connect()
 	defer closeFunc()
-	// Call the HelloToUser RPC function
-	r, err := c.HelloToUser(context.Background(), &wrapperspb.StringValue{Value: username})
+	if err != nil {
+		return "", fmt.Errorf("failed to connect: %v", err)
+	}
+	req := &wrapperspb.StringValue{Value: username}
+	res, err := c.HelloToUser(context.Background(), req)
 	if err != nil {
 		return "", fmt.Errorf("could not call HelloToUser: %v", err)
 	}
-	return r.Value, nil
+	return res.Value, nil
 }

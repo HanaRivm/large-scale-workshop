@@ -2,7 +2,7 @@ package TestService
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
@@ -21,10 +21,10 @@ func (obj *testServiceImplementation) HelloWorld(ctxt context.Context, _ *emptyp
 	return wrapperspb.String(TestServiceServant.HelloWorld()), nil
 }
 
-func (obj *testServiceImplementation) HelloToUser(ctxt context.Context, req *wrapperspb.StringValue) (res *wrapperspb.StringValue, err error) {
-	log.Println("HelloToUser called with username:", req.GetValue())
-	username := req.GetValue()
-	return wrapperspb.String(TestServiceServant.HelloToUser(username)), nil
+func (obj *testServiceImplementation) HelloToUser(ctx context.Context, req *wrapperspb.StringValue) (*wrapperspb.StringValue, error) {
+	Logger.Printf("HelloToUser called")
+	response := fmt.Sprintf("Hello %s", req.Value)
+	return wrapperspb.String(response), nil
 }
 
 func Start(configData []byte) error {
