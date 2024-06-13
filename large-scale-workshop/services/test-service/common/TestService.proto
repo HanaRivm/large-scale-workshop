@@ -1,6 +1,6 @@
 syntax = "proto3"; 
  
-option go_package = "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service"; 
+option go_package = "TestService"; 
  
 package testservice; 
  

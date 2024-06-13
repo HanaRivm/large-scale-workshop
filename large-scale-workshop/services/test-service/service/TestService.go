@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services"
+	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"

@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: TestService.proto
 
-package test_service
+package TestService
 
 import (
 	context "context"
