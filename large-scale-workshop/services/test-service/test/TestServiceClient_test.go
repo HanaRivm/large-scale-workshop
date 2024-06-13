@@ -64,3 +64,15 @@ func TestWaitAndRand(t *testing.T) {
 	}
 	t.Logf("Returned random number: %v\n", res)
 }
+func TestIsAlive(t *testing.T) {
+	c := client.NewTestServiceClient("localhost:50051")
+	res, err := c.IsAlive()
+	if err != nil {
+		t.Fatalf("Calling IsAlive failed: %v", err)
+		return
+	}
+	if !res {
+		t.Fatalf("IsAlive returned false, expected true")
+	}
+	t.Logf("IsAlive returned: %v\n", res)
+}

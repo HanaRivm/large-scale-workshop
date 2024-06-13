@@ -96,3 +96,15 @@ func (obj *TestServiceClient) WaitAndRand(seconds int32) (func() (int32,
 	}
 	return res, nil
 }
+func (obj *TestServiceClient) IsAlive() (bool, error) {
+	c, closeFunc, err := obj.Connect()
+	if err != nil {
+		return false, fmt.Errorf("failed to connect %v. Error: %v", obj.Address, err)
+	}
+	defer closeFunc()
+	r, err := c.IsAlive(context.Background(), &emptypb.Empty{})
+	if err != nil {
+		return false, fmt.Errorf("could not call IsAlive: %v", err)
+	}
+	return r.Value, nil
+}

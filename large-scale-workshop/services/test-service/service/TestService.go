@@ -56,3 +56,7 @@ func (obj *testServiceImplementation) WaitAndRand(seconds *wrapperspb.Int32Value
 	}
 	return TestServiceServant.WaitAndRand(seconds.Value, streamClient)
 }
+
+func (obj *testServiceImplementation) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
+	return &wrapperspb.BoolValue{Value: true}, nil
+}
