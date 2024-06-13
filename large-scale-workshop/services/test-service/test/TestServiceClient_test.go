@@ -27,4 +27,5 @@ func TestHelloToUser(t *testing.T) {
 	if r != expected {
 		t.Errorf("unexpected response: got %s, want %s", r, expected)
 	}
+	t.Logf("Response: %v", r)
 }
