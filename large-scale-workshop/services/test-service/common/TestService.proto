@@ -1,7 +1,6 @@
 syntax = "proto3"; 
  
 option go_package = "TestService"; 
- 
 package testservice; 
  
 // Import the necessary types for streaming and callback 
@@ -47,4 +46,4 @@ service TestService {
  
     // returns true 
     rpc IsAlive(google.protobuf.Empty) returns (google.protobuf.BoolValue); 
-} 
+}
