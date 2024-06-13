@@ -2,7 +2,7 @@ syntax = "proto3";
  
 option go_package = "TestService"; 
  
-package TestService; 
+package testservice; 
  
 // Import the necessary types for streaming and callback 
 import "google/protobuf/wrappers.proto"; 

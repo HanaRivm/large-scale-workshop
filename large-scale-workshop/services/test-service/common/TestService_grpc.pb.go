@@ -21,13 +21,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TestService_HelloWorld_FullMethodName          = "/TestService.TestService/HelloWorld"
-	TestService_HelloToUser_FullMethodName         = "/TestService.TestService/HelloToUser"
-	TestService_Store_FullMethodName               = "/TestService.TestService/Store"
-	TestService_Get_FullMethodName                 = "/TestService.TestService/Get"
-	TestService_WaitAndRand_FullMethodName         = "/TestService.TestService/WaitAndRand"
-	TestService_ExtractLinksFromURL_FullMethodName = "/TestService.TestService/ExtractLinksFromURL"
-	TestService_IsAlive_FullMethodName             = "/TestService.TestService/IsAlive"
+	TestService_HelloWorld_FullMethodName          = "/testservice.TestService/HelloWorld"
+	TestService_HelloToUser_FullMethodName         = "/testservice.TestService/HelloToUser"
+	TestService_Store_FullMethodName               = "/testservice.TestService/Store"
+	TestService_Get_FullMethodName                 = "/testservice.TestService/Get"
+	TestService_WaitAndRand_FullMethodName         = "/testservice.TestService/WaitAndRand"
+	TestService_ExtractLinksFromURL_FullMethodName = "/testservice.TestService/ExtractLinksFromURL"
+	TestService_IsAlive_FullMethodName             = "/testservice.TestService/IsAlive"
 )
 
 // TestServiceClient is the client API for TestService service.
@@ -338,7 +338,7 @@ func _TestService_IsAlive_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TestService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "TestService.TestService",
+	ServiceName: "testservice.TestService",
 	HandlerType: (*TestServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
