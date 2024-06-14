@@ -3,7 +3,7 @@ package servant
 import (
 	"context"
 
-	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/client"
+	client "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
 )
 
 type RegistryServant struct {

@@ -4,21 +4,24 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+	"gopkg.in/yaml.v2"
 )
 
 type testServiceImplementation struct {
 	UnimplementedTestServiceServer
 }
 
-func (obj *testServiceImplementation) HelloWorld(ctxt context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {
+func (obj *testServiceImplementation) HelloWorld(ctx context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {
 	return wrapperspb.String(TestServiceServant.HelloWorld()), nil
 }
 
@@ -27,6 +30,7 @@ func (obj *testServiceImplementation) HelloToUser(ctx context.Context, req *wrap
 	response := fmt.Sprintf("Hello %s", req.Value)
 	return wrapperspb.String(response), nil
 }
+
 func (obj *testServiceImplementation) Store(ctx context.Context, req *StoreKeyValue) (*emptypb.Empty, error) {
 	log.Printf("Store called with key: %s, value: %s", req.Key, req.Value)
 	TestServiceServant.Store(req.Key, req.Value)
@@ -40,13 +44,6 @@ func (obj *testServiceImplementation) Get(ctx context.Context, req *wrapperspb.S
 		return nil, fmt.Errorf("key not found: %s", req.Value)
 	}
 	return wrapperspb.String(value), nil
-}
-func Start(configData []byte) error {
-	bindgRPCToService := func(s grpc.ServiceRegistrar) {
-		RegisterTestServiceServer(s, &testServiceImplementation{})
-	}
-	services.Start("TestService", 50051, bindgRPCToService)
-	return nil
 }
 
 func (obj *testServiceImplementation) WaitAndRand(seconds *wrapperspb.Int32Value, streamRet TestService_WaitAndRandServer) error {
@@ -67,4 +64,35 @@ func (obj *testServiceImplementation) ExtractLinksFromURL(ctx context.Context, r
 		return nil, err
 	}
 	return &ExtractLinksFromURLReturnedValue{Links: links}, nil
+}
+
+func Start(configData []byte) error {
+	var config struct {
+		RegistryAddresses []string `yaml:"registry_addresses"`
+	}
+	err := yaml.Unmarshal(configData, &config)
+	if err != nil {
+		log.Fatalf("error unmarshaling service config: %v", err)
+	}
+
+	lis, err := net.Listen("tcp", ":0")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+	port := lis.Addr().(*net.TCPAddr).Port
+	listeningAddress := fmt.Sprintf("127.0.0.1:%d", port)
+	log.Printf("TestService listening on %s", listeningAddress)
+
+	unregister := services.RegisterAddress("TestService", config.RegistryAddresses, listeningAddress)
+	defer unregister()
+
+	s := grpc.NewServer()
+	RegisterTestServiceServer(s, &testServiceImplementation{})
+	reflection.Register(s)
+
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+
+	return nil
 }

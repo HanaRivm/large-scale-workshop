@@ -2,8 +2,6 @@ github.com/MetaFFI/lang-plugin-go/api v0.0.0-20240528185259-d34b330dbc2d h1:o9SB
 github.com/MetaFFI/lang-plugin-go/api v0.0.0-20240528185259-d34b330dbc2d/go.mod h1:jYqohAnWJ5yL0/xr+4IH/Yg555qQvskmNk9dAZft+yE=
 github.com/MetaFFI/lang-plugin-go/go-runtime v0.0.0-20240423121836-171589282d0a h1:k0DkZjvXxIB8jqNtwz3EZ+d+4X2RDUL3CDqTWWmCZSA=
 github.com/MetaFFI/lang-plugin-go/go-runtime v0.0.0-20240423121836-171589282d0a/go.mod h1:XCxnpinykfiuZv5QTEJO7lqGQB4kA/MNkoE7vYl3SQI=
-github.com/MetaFFI/lang-plugin-go/go-runtime v0.0.0-20240528185259-d34b330dbc2d h1:DvR4kFhK1PgK4xXCYieOM2c4u5nzI/w7hD6kJ3HgeDM=
-github.com/MetaFFI/lang-plugin-go/go-runtime v0.0.0-20240528185259-d34b330dbc2d/go.mod h1:T+Fk2kPJ0bRQOelXgmCJM3kDlJ6UpoJTDhC8ZVTx+No=
 github.com/MetaFFI/plugin-sdk v0.1.2 h1:T4B/Uam88A2J9sDQ1sYErl/FU1F38po9fqz4RL/rLgo=
 github.com/MetaFFI/plugin-sdk v0.1.2/go.mod h1:79F8rT5uWTKtzFhl18kvi227tXkUk/9K3ZqhJkHDGWs=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

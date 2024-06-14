@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/config"
+	RegistryService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
 	TestService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/service"
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"gopkg.in/yaml.v2"
@@ -33,7 +34,9 @@ func main() {
 	case "TestService":
 		utils.Logger.Printf("Loading service type: %v\n", config.Type)
 		TestService.Start(configData)
-
+	case "RegistryService":
+		utils.Logger.Printf("Loading service type: %v\n", config.Type)
+		RegistryService.RunServer()
 	default:
 		utils.Logger.Fatalf("Unknown configuration type: %v", config.Type)
 		os.Exit(4)

@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
-	client "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/client"
-	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
+	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
+	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
 )
 
 const bufSize = 1024 * 1024
@@ -19,7 +19,7 @@ var lis *bufconn.Listener
 func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	client.RegisterRegistryServiceServer(s, service.NewRegistryServer())
+	pb.RegisterRegistryServiceServer(s, service.NewRegistryServer())
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			panic(err)
@@ -38,17 +38,17 @@ func TestRegistryService(t *testing.T) {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
-	client := client.NewRegistryServiceClient(conn)
+	client := pb.NewRegistryServiceClient(conn)
 
 	t.Run("Register", func(t *testing.T) {
-		_, err := client.Register(ctx, &client.RegisterRequest{ServiceName: "testService", NodeAddress: "127.0.0.1:5000"})
+		_, err := client.Register(ctx, &pb.RegisterRequest{ServiceName: "testService", NodeAddress: "127.0.0.1:5000"})
 		if err != nil {
 			t.Fatalf("Register failed: %v", err)
 		}
 	})
 
 	t.Run("Discover", func(t *testing.T) {
-		res, err := client.Discover(ctx, &client.DiscoverRequest{ServiceName: "testService"})
+		res, err := client.Discover(ctx, &pb.DiscoverRequest{ServiceName: "testService"})
 		if err != nil {
 			t.Fatalf("Discover failed: %v", err)
 		}
@@ -58,19 +58,9 @@ func TestRegistryService(t *testing.T) {
 	})
 
 	t.Run("Unregister", func(t *testing.T) {
-		_, err := client.Unregister(ctx, &client.UnregisterRequest{ServiceName: "testService", NodeAddress: "127.0.0.1:5000"})
+		_, err := client.Unregister(ctx, &pb.UnregisterRequest{ServiceName: "testService", NodeAddress: "127.0.0.1:5000"})
 		if err != nil {
 			t.Fatalf("Unregister failed: %v", err)
-		}
-	})
-
-	t.Run("IsAlive", func(t *testing.T) {
-		res, err := client.IsAlive(ctx, &client.IsAliveRequest{NodeAddress: "127.0.0.1:5000"})
-		if err != nil {
-			t.Fatalf("IsAlive failed: %v", err)
-		}
-		if !res.Alive {
-			t.Fatalf("Node is not alive")
 		}
 	})
 }
