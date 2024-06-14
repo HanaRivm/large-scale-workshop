@@ -3,18 +3,18 @@ package servant
 import (
 	"context"
 
-	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service"
+	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/client"
 )
 
 type RegistryServant struct {
-	client pb.RegistryServiceClient
+	client client.RegistryServiceClient
 }
 
-func NewRegistryServant(client pb.RegistryServiceClient) *RegistryServant {
+func NewRegistryServant(client client.RegistryServiceClient) *RegistryServant {
 	return &RegistryServant{client: client}
 }
 
-func (s *RegistryServant) IsAlive(ctx context.Context, req *pb.IsAliveRequest) (*pb.IsAliveResponse, error) {
+func (s *RegistryServant) IsAlive(ctx context.Context, req *client.IsAliveRequest) (*client.IsAliveResponse, error) {
 	// Implement the health check logic
 	return s.client.IsAlive(ctx, req)
 }

@@ -5,7 +5,8 @@ import (
 	"log"
 	"time"
 
-	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service"
+	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
+
 	"google.golang.org/grpc"
 )
 
