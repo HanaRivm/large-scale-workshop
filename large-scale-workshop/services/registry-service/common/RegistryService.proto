@@ -4,9 +4,11 @@ option go_package = "RegistryService";
 
 package registryservice;
 
+import "google/protobuf/empty.proto"; 
+
 service RegistryService {
-    rpc Register(RegisterRequest) returns (RegisterResponse);
-    rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
+    rpc Register(RegisterRequest) returns (google.protobuf.Empty);
+    rpc Unregister(UnregisterRequest) returns (google.protobuf.Empty);
     rpc Discover(DiscoverRequest) returns (DiscoverResponse);
     rpc IsAlive(IsAliveRequest) returns (IsAliveResponse);
 }
@@ -20,17 +22,9 @@ message RegisterRequest {
     string node_address = 2;
 }
 
-message RegisterResponse {
-    bool success = 1;
-}
-
 message UnregisterRequest {
     string service_name = 1;
     string node_address = 2;
-}
-
-message UnregisterResponse {
-    bool success = 1;
 }
 
 message DiscoverResponse {

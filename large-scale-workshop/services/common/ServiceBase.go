@@ -1,8 +1,11 @@
 package common
 
 import (
+	"context"
 	"fmt"
 	"net"
+
+	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
 
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"google.golang.org/grpc"
@@ -24,13 +27,22 @@ func startgRPC(listenPort int) (listeningAddress string, grpcServer *grpc.Server
 	return
 }
 func registerAddress(serviceName string, registryAddresses []string, listeningAddress string) (unregister func()) {
-	registryClient := RegistryServiceClient.NewRegistryServiceClient(registryAddresses)
-	err := registryClient.Register(serviceName, listeningAddress)
+	registryClient := pb.NewRegistryServiceClient(&ServiceClientBase(registryAddresses))
+	_, err := registryClient.Register(context.Background(), &pb.RegisterRequest{
+		ServiceName: serviceName,
+		NodeAddress: listeningAddress,
+	})
 	if err != nil {
 		Logger.Fatalf("Failed to register to registry service: %v", err)
 	}
 	return func() {
-		registryClient.Unregister(serviceName, listeningAddress)
+		_, err := registryClient.Unregister(context.Background(), &pb.UnregisterRequest{
+			ServiceName: serviceName,
+			NodeAddress: listeningAddress,
+		})
+		if err != nil {
+			Logger.Printf("Failed to unregister from registry service: %v", err)
+		}
 	}
 }
 func Start(serviceName string, grpcListenPort int, bindgRPCToService func(s grpc.ServiceRegistrar)) {

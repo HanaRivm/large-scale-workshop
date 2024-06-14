@@ -8,6 +8,7 @@ package RegistryService
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -29,8 +30,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RegistryServiceClient interface {
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
-	Unregister(ctx context.Context, in *UnregisterRequest, opts ...grpc.CallOption) (*UnregisterResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	Unregister(ctx context.Context, in *UnregisterRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	Discover(ctx context.Context, in *DiscoverRequest, opts ...grpc.CallOption) (*DiscoverResponse, error)
 	IsAlive(ctx context.Context, in *IsAliveRequest, opts ...grpc.CallOption) (*IsAliveResponse, error)
 }
@@ -43,8 +44,8 @@ func NewRegistryServiceClient(cc grpc.ClientConnInterface) RegistryServiceClient
 	return &registryServiceClient{cc}
 }
 
-func (c *registryServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
-	out := new(RegisterResponse)
+func (c *registryServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, RegistryService_Register_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -52,8 +53,8 @@ func (c *registryServiceClient) Register(ctx context.Context, in *RegisterReques
 	return out, nil
 }
 
-func (c *registryServiceClient) Unregister(ctx context.Context, in *UnregisterRequest, opts ...grpc.CallOption) (*UnregisterResponse, error) {
-	out := new(UnregisterResponse)
+func (c *registryServiceClient) Unregister(ctx context.Context, in *UnregisterRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, RegistryService_Unregister_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -83,8 +84,8 @@ func (c *registryServiceClient) IsAlive(ctx context.Context, in *IsAliveRequest,
 // All implementations must embed UnimplementedRegistryServiceServer
 // for forward compatibility
 type RegistryServiceServer interface {
-	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
-	Unregister(context.Context, *UnregisterRequest) (*UnregisterResponse, error)
+	Register(context.Context, *RegisterRequest) (*empty.Empty, error)
+	Unregister(context.Context, *UnregisterRequest) (*empty.Empty, error)
 	Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error)
 	IsAlive(context.Context, *IsAliveRequest) (*IsAliveResponse, error)
 	mustEmbedUnimplementedRegistryServiceServer()
@@ -94,10 +95,10 @@ type RegistryServiceServer interface {
 type UnimplementedRegistryServiceServer struct {
 }
 
-func (UnimplementedRegistryServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+func (UnimplementedRegistryServiceServer) Register(context.Context, *RegisterRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedRegistryServiceServer) Unregister(context.Context, *UnregisterRequest) (*UnregisterResponse, error) {
+func (UnimplementedRegistryServiceServer) Unregister(context.Context, *UnregisterRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unregister not implemented")
 }
 func (UnimplementedRegistryServiceServer) Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error) {
