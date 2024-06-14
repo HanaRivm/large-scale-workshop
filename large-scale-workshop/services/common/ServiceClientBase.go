@@ -10,7 +10,6 @@ import (
 
 type ServiceClientBase[client_t any] struct {
 	RegistryAddresses []string
-	conn              *grpc.ClientConn
 	CreateClient      func(grpc.ClientConnInterface) client_t
 }
 
