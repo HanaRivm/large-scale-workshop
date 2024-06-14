@@ -24,8 +24,8 @@ func startgRPC(listenPort int) (listeningAddress string, grpcServer *grpc.Server
 	}
 	return
 }
-func registerAddress(serviceName string, registryAddresses []string,
-	listeningAddress string) (unregister func()) {
+
+func registerAddress(serviceName string, registryAddresses []string, listeningAddress string) (unregister func()) {
 	registryClient := RegistryServiceClient.NewRegistryServiceClient(registryAddresses)
 	err := registryClient.Register(serviceName, listeningAddress)
 	if err != nil {

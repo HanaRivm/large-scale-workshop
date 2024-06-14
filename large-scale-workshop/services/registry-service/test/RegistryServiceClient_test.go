@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
-	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
+	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
 )
 
 const bufSize = 1024 * 1024
