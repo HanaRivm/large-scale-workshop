@@ -114,7 +114,7 @@ func (obj *TestServiceClient) ExtractLinksFromURL(url string, depth int32) ([]st
 		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.Address, err)
 	}
 	defer closeFunc()
-	req := &ExtractLinksFromURLParameters{Url: url, Depth: depth}
+	req := &service.ExtractLinksFromURLParameters{Url: url, Depth: depth}
 	res, err := c.ExtractLinksFromURL(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("could not call ExtractLinksFromURL: %v", err)

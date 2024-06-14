@@ -34,7 +34,7 @@ func init() {
 		panic(msg)
 	}
 	// Load the Crawler module
-	crawlerModule, err = pythonRuntime.LoadModule("./crawler.py")
+	crawlerModule, err = pythonRuntime.LoadModule("../crawler.py")
 	if err != nil {
 		msg := fmt.Sprintf("Failed to load ./crawler/crawler.py module: %v", err)
 		utils.Logger.Fatalf(msg)
