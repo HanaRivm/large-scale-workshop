@@ -60,3 +60,11 @@ func (obj *testServiceImplementation) WaitAndRand(seconds *wrapperspb.Int32Value
 func (obj *testServiceImplementation) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
 	return &wrapperspb.BoolValue{Value: true}, nil
 }
+
+func (obj *testServiceImplementation) ExtractLinksFromURL(ctx context.Context, req *ExtractLinksFromURLParameters) (*ExtractLinksFromURLReturnedValue, error) {
+	links, err := TestServiceServant.ExtractLinksFromURL(req.Url, req.Depth)
+	if err != nil {
+		return nil, err
+	}
+	return &ExtractLinksFromURLReturnedValue{Links: links}, nil
+}

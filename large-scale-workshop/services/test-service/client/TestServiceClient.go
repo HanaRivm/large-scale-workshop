@@ -108,3 +108,16 @@ func (obj *TestServiceClient) IsAlive() (bool, error) {
 	}
 	return r.Value, nil
 }
+func (obj *TestServiceClient) ExtractLinksFromURL(url string, depth int32) ([]string, error) {
+	c, closeFunc, err := obj.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.Address, err)
+	}
+	defer closeFunc()
+	req := &ExtractLinksFromURLParameters{Url: url, Depth: depth}
+	res, err := c.ExtractLinksFromURL(context.Background(), req)
+	if err != nil {
+		return nil, fmt.Errorf("could not call ExtractLinksFromURL: %v", err)
+	}
+	return res.Links, nil
+}

@@ -76,3 +76,16 @@ func TestIsAlive(t *testing.T) {
 	}
 	t.Logf("IsAlive returned: %v\n", res)
 }
+
+func TestExtractLinksFromURLClient(t *testing.T) {
+	c := client.NewTestServiceClient("localhost:50051")
+	links, err := c.ExtractLinksFromURL("http://example.com", 1)
+	if err != nil {
+		t.Fatalf("Calling ExtractLinksFromURL failed: %v", err)
+		return
+	}
+	if len(links) == 0 {
+		t.Fatalf("ExtractLinksFromURL returned no links")
+	}
+	t.Logf("Returned links: %v\n", links)
+}
