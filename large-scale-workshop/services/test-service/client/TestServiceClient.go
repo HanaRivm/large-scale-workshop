@@ -14,12 +14,12 @@ type TestServiceClient struct {
 	services.ServiceClientBase[service.TestServiceClient]
 }
 
-func NewTestServiceClient(address string) *TestServiceClient {
+func NewTestServiceClient(registry_addresses []string) *TestServiceClient {
 	return &TestServiceClient{
 
 		ServiceClientBase: services.ServiceClientBase[service.TestServiceClient]{
-			Address:      address,
-			CreateClient: service.NewTestServiceClient,
+			RegistryAddresses: registry_addresses,
+			CreateClient:      service.NewTestServiceClient,
 		},
 	}
 }
