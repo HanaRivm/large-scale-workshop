@@ -4,7 +4,6 @@ option go_package = "RegistryService";
 
 package registryservice;
 
-
 service RegistryService {
     rpc Register(RegisterRequest) returns (RegisterResponse);
     rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
