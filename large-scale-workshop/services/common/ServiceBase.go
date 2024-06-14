@@ -1,12 +1,10 @@
 package common
 
 import (
-	"context"
 	"fmt"
 	"net"
 
-	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
-
+	RegistryServiceClient "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/client"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"google.golang.org/grpc"
 )
@@ -26,30 +24,14 @@ func startgRPC(listenPort int) (listeningAddress string, grpcServer *grpc.Server
 	}
 	return
 }
-func RegisterAddress(serviceName string, registryAddresses []string, listeningAddress string) (unregister func()) {
-	clientBase := &ServiceClientBase{
-		RegistryAddresses: registryAddresses,
-	}
-	err := clientBase.Connect()
-	if err != nil {
-		Logger.Fatalf("Failed to connect to registry service: %v", err)
-	}
-
-	_, err = clientBase.client.Register(context.Background(), &pb.RegisterRequest{
-		ServiceName: serviceName,
-		NodeAddress: listeningAddress,
-	})
+func registerAddress(serviceName string, registryAddresses []string,
+	listeningAddress string) (unregister func()) {
+	registryClient := RegistryServiceClient.NewRegistryServiceClient(registryAddresses)
+	err := registryClient.Register(serviceName, listeningAddress)
 	if err != nil {
 		Logger.Fatalf("Failed to register to registry service: %v", err)
 	}
-
 	return func() {
-		_, err := clientBase.client.Unregister(context.Background(), &pb.UnregisterRequest{
-			ServiceName: serviceName,
-			NodeAddress: listeningAddress,
-		})
-		if err != nil {
-			Logger.Printf("Failed to unregister from registry service: %v", err)
-		}
+		registryClient.Unregister(serviceName, listeningAddress)
 	}
 }

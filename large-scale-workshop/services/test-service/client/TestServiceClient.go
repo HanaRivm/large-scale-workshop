@@ -82,7 +82,7 @@ func (obj *TestServiceClient) WaitAndRand(seconds int32) (func() (int32,
 	error), error) {
 	c, closeFunc, err := obj.Connect()
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.Address,
+		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.RegistryAddresses,
 			err)
 	}
 	r, err := c.WaitAndRand(context.Background(), wrapperspb.Int32(seconds))
@@ -99,7 +99,7 @@ func (obj *TestServiceClient) WaitAndRand(seconds int32) (func() (int32,
 func (obj *TestServiceClient) IsAlive() (bool, error) {
 	c, closeFunc, err := obj.Connect()
 	if err != nil {
-		return false, fmt.Errorf("failed to connect %v. Error: %v", obj.Address, err)
+		return false, fmt.Errorf("failed to connect %v. Error: %v", obj.RegistryAddresses, err)
 	}
 	defer closeFunc()
 	r, err := c.IsAlive(context.Background(), &emptypb.Empty{})
@@ -111,7 +111,7 @@ func (obj *TestServiceClient) IsAlive() (bool, error) {
 func (obj *TestServiceClient) ExtractLinksFromURL(url string, depth int32) ([]string, error) {
 	c, closeFunc, err := obj.Connect()
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.Address, err)
+		return nil, fmt.Errorf("failed to connect %v. Error: %v", obj.RegistryAddresses, err)
 	}
 	defer closeFunc()
 	req := &service.ExtractLinksFromURLParameters{Url: url, Depth: depth}

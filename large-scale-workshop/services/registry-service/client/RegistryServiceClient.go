@@ -1,4 +1,4 @@
-package client
+package RegistryServiceClient
 
 import (
 	"context"
@@ -10,21 +10,21 @@ import (
 	"google.golang.org/grpc"
 )
 
-type RegistryClient struct {
+type RegistryServiceClient struct {
 	client service.RegistryServiceClient
 	conn   *grpc.ClientConn
 }
 
-func NewRegistryClient(address string) (*RegistryClient, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(time.Second*5))
+func NewRegistryServiceClient(addresses []string) *RegistryServiceClient {
+	conn, err := grpc.Dial(addresses[0], grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(time.Second*5))
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	client := service.NewRegistryServiceClient(conn)
-	return &RegistryClient{client: client, conn: conn}, nil
+	return &RegistryServiceClient{client: client, conn: conn}
 }
 
-func (c *RegistryClient) Register(serviceName, nodeAddress string) error {
+func (c *RegistryServiceClient) Register(serviceName, nodeAddress string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -32,7 +32,7 @@ func (c *RegistryClient) Register(serviceName, nodeAddress string) error {
 	return err
 }
 
-func (c *RegistryClient) Unregister(serviceName, nodeAddress string) error {
+func (c *RegistryServiceClient) Unregister(serviceName, nodeAddress string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -40,7 +40,7 @@ func (c *RegistryClient) Unregister(serviceName, nodeAddress string) error {
 	return err
 }
 
-func (c *RegistryClient) Discover(serviceName string) ([]string, error) {
+func (c *RegistryServiceClient) Discover(serviceName string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -51,7 +51,7 @@ func (c *RegistryClient) Discover(serviceName string) ([]string, error) {
 	return res.NodeAddresses, nil
 }
 
-func (c *RegistryClient) Close() {
+func (c *RegistryServiceClient) Close() {
 	if err := c.conn.Close(); err != nil {
 		log.Printf("Error closing connection: %v", err)
 	}
