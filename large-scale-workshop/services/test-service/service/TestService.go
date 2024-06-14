@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 
+	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
@@ -82,7 +83,7 @@ func Start(configData []byte) error {
 	listeningAddress := fmt.Sprintf("127.0.0.1:%d", port)
 	log.Printf("TestService listening on %s", listeningAddress)
 
-	unregister := services.registerAddress("TestService", config.RegistryAddresses, listeningAddress)
+	unregister := services.RegisterAddress("TestService", config.RegistryAddresses, listeningAddress)
 	defer unregister()
 
 	s := grpc.NewServer()
