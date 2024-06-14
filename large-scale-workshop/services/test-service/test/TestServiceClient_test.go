@@ -79,7 +79,7 @@ func TestIsAlive(t *testing.T) {
 
 func TestExtractLinksFromURLClient(t *testing.T) {
 	c := client.NewTestServiceClient("localhost:50051")
-	links, err := c.ExtractLinksFromURL("http://example.com", 1)
+	links, err := c.ExtractLinksFromURL("https://www.microsoft.com", 1)
 	if err != nil {
 		t.Fatalf("Calling ExtractLinksFromURL failed: %v", err)
 		return

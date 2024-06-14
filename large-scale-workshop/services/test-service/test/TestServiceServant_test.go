@@ -7,7 +7,7 @@ import (
 )
 
 func TestExtractLinksFromURLServant(t *testing.T) {
-	links, err := servant.ExtractLinksFromURL("http://example.com", 1)
+	links, err := servant.ExtractLinksFromURL("https://www.microsoft.com", 1)
 	if err != nil {
 		t.Fatalf("ExtractLinksFromURL failed: %v", err)
 	}

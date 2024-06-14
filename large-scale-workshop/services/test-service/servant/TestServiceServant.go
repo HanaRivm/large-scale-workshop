@@ -27,7 +27,7 @@ func init() {
 	}
 
 	// Load the Crawler module
-	crawlerModule, err = pythonRuntime.LoadModule("./crawler.py")
+	crawlerModule, err = pythonRuntime.LoadModule("/workspaces/HANA/large-scale-workshop/services/test-service/servant/crawler.py")
 	if err != nil {
 		msg := fmt.Sprintf("Failed to load ./crawler/crawler.py module: %v", err)
 		utils.Logger.Fatalf(msg)

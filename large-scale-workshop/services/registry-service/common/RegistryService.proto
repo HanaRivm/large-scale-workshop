@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package registry;
+
+service RegistryService {
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
+    rpc Discover(DiscoverRequest) returns (DiscoverResponse);
+    rpc IsAlive(IsAliveRequest) returns (IsAliveResponse);
+}
+
+message RegisterRequest {
+    string service_name = 1;
+    string node_address = 2;
+}
+
+message RegisterResponse {
+    bool success = 1;
+}
+
+message UnregisterRequest {
+    string service_name = 1;
+    string node_address = 2;
+}
+
+message UnregisterResponse {
+    bool success = 1;
+}
+
+message DiscoverRequest {
+    string service_name = 1;
+}
+
+message DiscoverResponse {
+    repeated string node_addresses = 1;
+}
+
+message IsAliveRequest {
+    string node_address = 1;
+}
+
+message IsAliveResponse {
+    bool alive = 1;
+}
