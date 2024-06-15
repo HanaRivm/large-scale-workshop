@@ -40,12 +40,12 @@ func pickRandomNode(nodes []string) string {
 }
 
 func TestTestServiceClient(t *testing.T) {
-	// List of registry service addresses
 	registryAddresses := []string{
 		"127.0.0.1:8502",
+		"127.0.0.1:8503",
 	}
 
-	clientBase, err := getClient(registryAddresses[0])
+	clientBase, err := getClient(registryAddresses)
 	if err != nil {
 		t.Fatalf("Failed to connect to registry service: %v", err)
 	}
@@ -89,13 +89,11 @@ func TestTestServiceClient(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 
-		// Test Store
 		err := c.Store("key1", "value1")
 		if err != nil {
 			t.Fatalf("could not call Store: %v", err)
 		}
 
-		// Test Get
 		r, err := c.Get("key1")
 		if err != nil {
 			t.Fatalf("could not call Get: %v", err)

@@ -36,7 +36,7 @@ func main() {
 		TestService.Start(configData)
 	case "RegistryService":
 		utils.Logger.Printf("Loading service type: %v\n", config.Type)
-		RegistryService.RunServer()
+		RegistryService.RunServer(configData)
 	default:
 		utils.Logger.Fatalf("Unknown configuration type: %v", config.Type)
 		os.Exit(4)

@@ -63,6 +63,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	isFirst, err = chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required", []IDL.MetaFFIType{IDL.HANDLE}, []IDL.MetaFFIType{IDL.BOOL})
+	if err != nil {
+		log.Fatalf("Failed to load isFirst: %v", err)
+	}
 }
 
 type Chord struct {
