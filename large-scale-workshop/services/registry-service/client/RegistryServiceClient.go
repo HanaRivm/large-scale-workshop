@@ -16,7 +16,7 @@ type RegistryServiceClient struct {
 }
 
 func NewRegistryServiceClient(addresses []string) *RegistryServiceClient {
-	conn, err := grpc.Dial(addresses[0], grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(time.Second*5))
+	conn, err := grpc.Dial(addresses[0], grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil
 	}
@@ -41,7 +41,7 @@ func (c *RegistryServiceClient) Unregister(serviceName, nodeAddress string) erro
 }
 
 func (c *RegistryServiceClient) Discover(serviceName string) ([]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	res, err := c.client.Discover(ctx, &service.DiscoverRequest{ServiceName: serviceName})

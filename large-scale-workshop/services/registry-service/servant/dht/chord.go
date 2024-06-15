@@ -17,11 +17,10 @@ var get func(...interface{}) ([]interface{}, error)
 var pdelete func(...interface{}) ([]interface{}, error)
 var getAllKeys func(...interface{}) ([]interface{}, error)
 var isFirst func(...interface{}) ([]interface{}, error)
-var err error
 
 func init() {
 	openjdkRuntime = metaffi.NewMetaFFIRuntime("openjdk")
-	chordModule, err = openjdkRuntime.LoadModule("./dht/Chord.class")
+	chordModule, err := openjdkRuntime.LoadModule("./dht/Chord.class")
 	newChord, err = chordModule.Load("class=dht.Chord,callable=<init>",
 		[]IDL.MetaFFIType{IDL.STRING8, IDL.INT32},
 		[]IDL.MetaFFIType{IDL.HANDLE})
