@@ -16,7 +16,6 @@ import (
 )
 
 type registryServer struct {
-	pb.UnimplementedRegistryServiceServer
 	mu       sync.Mutex
 	services map[string][]string
 }
