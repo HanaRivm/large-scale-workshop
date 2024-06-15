@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type registryServer struct {
@@ -53,6 +54,10 @@ func (s *registryServer) Discover(ctx context.Context, req *pb.DiscoverRequest) 
 	defer s.mu.Unlock()
 	nodes := s.services[req.ServiceName]
 	return &pb.DiscoverResponse{NodeAddresses: nodes}, nil
+}
+
+func (s *registryServer) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
+	return &wrapperspb.BoolValue{Value: true}, nil
 }
 
 func (s *registryServer) startHealthCheck() {

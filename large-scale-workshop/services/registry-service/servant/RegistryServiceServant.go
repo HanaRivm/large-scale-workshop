@@ -18,5 +18,5 @@ func NewRegistryServant(client client.RegistryServiceClient) *RegistryServant {
 
 func (s *RegistryServant) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
 	// Implement the health check logic
-	return s.client.IsAlive(ctx, req)
+	return s.client.(ctx, req)
 }
