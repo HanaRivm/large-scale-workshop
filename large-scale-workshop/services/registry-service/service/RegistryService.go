@@ -162,23 +162,23 @@ func RunServer(configData []byte) error {
 		Port int32  `yaml:"port"`
 		Name string `yaml:"name"`
 	}
+
 	err := yaml.Unmarshal(configData, &config)
 	if err != nil {
 		return fmt.Errorf("error unmarshaling service config: %v", err)
 	}
 	port := config.Port
-
+	var lis net.Listener
 	for {
-		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
+			log.Println(err.Error())
 			log.Printf("Port %d in use, trying next port", port)
 			port++
 		} else {
-			lis.Close()
 			break
 		}
 	}
-
 	server := NewRegistryServer()
 	if rootNodeName == "" {
 		server.chord, err = dht.NewChord(config.Name, port)
@@ -205,5 +205,5 @@ func RunServer(configData []byte) error {
 	reflection.Register(s)
 
 	log.Printf("Registry service is running on port %d", port)
-	return nil
+	return s.Serve(lis)
 }

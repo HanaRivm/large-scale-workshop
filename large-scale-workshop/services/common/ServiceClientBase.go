@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -20,11 +21,14 @@ func (obj *ServiceClientBase[client_t]) pickNode() string {
 
 func (obj *ServiceClientBase[client_t]) Connect() (res client_t, closeFunc func(), err error) {
 	registryAddress := obj.pickNode()
-	conn, err := grpc.Dial(registryAddress, grpc.WithInsecure(), grpc.WithBlock())
+	log.Printf("picking node%s", registryAddress)
+	conn, err := grpc.Dial(registryAddress, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(time.Minute))
 	if err != nil {
 		var empty client_t
 		return empty, nil, fmt.Errorf("failed to connect client to %v: %v", obj.RegistryAddresses, err)
 	}
+	log.Printf("picking node2")
+
 	c := obj.CreateClient(conn)
 	return c, func() { conn.Close() }, nil
 }

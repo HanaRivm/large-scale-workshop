@@ -3,6 +3,7 @@ package TestService
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -17,6 +18,8 @@ func getClient(registryAddress string) (*common.ServiceClientBase[registryClient
 		RegistryAddresses: []string{registryAddress},
 		CreateClient:      registryClient.NewRegistryServiceClient,
 	}
+	log.Printf("Connecting to registry service at: %s", registryAddress)
+
 	_, _, err := clientBase.Connect()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to registry service: %v", err)
@@ -46,21 +49,25 @@ func TestTestServiceClient(t *testing.T) {
 	}
 
 	clientBase, err := getClient(registryAddresses[0])
+
 	if err != nil {
 		t.Fatalf("Failed to connect to registry service: %v", err)
 	}
 
+	log.Println("Discovering TestService nodes")
 	nodes, err := discoverNodes(clientBase, "TestService")
 	if err != nil {
 		t.Fatalf("Failed to discover nodes: %v", err)
 	}
 
+	log.Printf("Discovered nodes: %v", nodes)
 	if len(nodes) < 2 {
 		t.Fatalf("Expected at least 2 TestService nodes, got %d", len(nodes))
 	}
 
 	t.Run("HelloWorld", func(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling HelloWorld on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 		r, err := c.HelloWorld()
 		if err != nil {
@@ -73,6 +80,7 @@ func TestTestServiceClient(t *testing.T) {
 	t.Run("HelloToUser", func(t *testing.T) {
 		username := "Alice"
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling HelloToUser on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 		r, err := c.HelloToUser(username)
 		if err != nil {
@@ -87,6 +95,7 @@ func TestTestServiceClient(t *testing.T) {
 
 	t.Run("StoreAndGet", func(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling Store on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 
 		err := c.Store("key1", "value1")
@@ -94,6 +103,7 @@ func TestTestServiceClient(t *testing.T) {
 			t.Fatalf("could not call Store: %v", err)
 		}
 
+		log.Printf("Calling Get on node: %s", nodeAddress)
 		r, err := c.Get("key1")
 		if err != nil {
 			t.Fatalf("could not call Get: %v", err)
@@ -107,6 +117,7 @@ func TestTestServiceClient(t *testing.T) {
 
 	t.Run("WaitAndRand", func(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling WaitAndRand on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 		resPromise, err := c.WaitAndRand(3)
 		if err != nil {
@@ -123,6 +134,7 @@ func TestTestServiceClient(t *testing.T) {
 
 	t.Run("IsAlive", func(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling IsAlive on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 		res, err := c.IsAlive()
 		if err != nil {
@@ -137,6 +149,7 @@ func TestTestServiceClient(t *testing.T) {
 
 	t.Run("ExtractLinksFromURL", func(t *testing.T) {
 		nodeAddress := pickRandomNode(nodes)
+		log.Printf("Calling ExtractLinksFromURL on node: %s", nodeAddress)
 		c := client.NewTestServiceClient([]string{nodeAddress})
 		links, err := c.ExtractLinksFromURL("https://www.microsoft.com", 1)
 		if err != nil {

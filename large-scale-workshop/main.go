@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/config"
-	RegistryService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/servant/dht"
+	RegistryService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/service"
 	TestService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/service"
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/utils"
 	"gopkg.in/yaml.v2"
