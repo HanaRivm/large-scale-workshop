@@ -2,13 +2,14 @@ package RegistryService
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"sync"
 	"time"
 
 	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
+	testserviceclient "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -16,6 +17,7 @@ import (
 )
 
 type registryServer struct {
+	pb.UnimplementedRegistryServiceServer
 	mu       sync.Mutex
 	services map[string][]string
 }
@@ -56,35 +58,37 @@ func (s *registryServer) Discover(ctx context.Context, req *pb.DiscoverRequest) 
 }
 
 func (s *registryServer) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return &wrapperspb.BoolValue{Value: true}, nil
 }
-
 func (s *registryServer) startHealthCheck() {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		s.mu.Lock()
-		for _, nodes := range s.services {
+		for serviceName, nodes := range s.services {
 			for _, node := range nodes {
 				conn, err := grpc.Dial(node, grpc.WithInsecure(), grpc.WithBlock())
 				if err != nil {
+					log.Printf("Failed to connect to node %s: %v", node, err)
 					continue
 				}
-				client := pb.NewRegistryServiceClient(conn)
-				_, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				// Use the correct client for the TestService
+				client := testserviceclient.NewTestServiceClient(conn)
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 				defer cancel()
-				res, err := client.IsAlive(context.Background(), &emptypb.Empty{})
+
+				res, err := client.IsAlive(ctx, &emptypb.Empty{})
 				if err != nil {
-					log.Printf("error is not nil")
-					fmt.Println("Error:", err)
+					s.services[serviceName] = removeNode(s.services[serviceName], node)
+				} else {
+					if !res.Value {
+						log.Printf("Node %s is not responding, removing from registry", node)
+						s.services[serviceName] = removeNode(s.services[serviceName], node)
+					}
 				}
-				log.Printf(res.String())
-				//|| !res.Value {
-				//
-				//	log.Printf("Node %s is not responding, removing from registry", node)
-				//	s.services[serviceName] = removeNode(s.services[serviceName], node)
-				//}
 				conn.Close()
 			}
 		}
