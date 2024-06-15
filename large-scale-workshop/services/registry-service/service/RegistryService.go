@@ -28,7 +28,9 @@ func NewRegistryServer() *registryServer {
 func (s *registryServer) Register(ctx context.Context, req *pb.RegisterRequest) (*emptypb.Empty, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	log.Printf("Attempting to register service: %s at address: %s", req.ServiceName, req.NodeAddress)
 	s.services[req.ServiceName] = append(s.services[req.ServiceName], req.NodeAddress)
+	log.Printf("Successfully registered service: %s at address: %s", req.ServiceName, req.NodeAddress)
 	return &emptypb.Empty{}, nil
 }
 
@@ -53,7 +55,6 @@ func (s *registryServer) Discover(ctx context.Context, req *pb.DiscoverRequest) 
 }
 
 func (s *registryServer) IsAlive(ctx context.Context, req *pb.IsAliveRequest) (*pb.IsAliveResponse, error) {
-	// This is a placeholder for the actual health check logic
 	return &pb.IsAliveResponse{Alive: true}, nil
 }
 

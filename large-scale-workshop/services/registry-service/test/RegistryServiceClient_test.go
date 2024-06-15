@@ -64,3 +64,19 @@ func TestRegistryService(t *testing.T) {
 		}
 	})
 }
+
+func TestServiceRegistration(t *testing.T) {
+	registry := service.NewRegistryServer()
+	// Register a test service
+	registry.Register(context.Background(), &pb.RegisterRequest{ServiceName: "TestService", NodeAddress: "127.0.0.1:5000"})
+
+	// Discover the test service
+	res, err := registry.Discover(context.Background(), &pb.DiscoverRequest{ServiceName: "TestService"})
+	if err != nil {
+		t.Fatalf("Failed to discover service: %v", err)
+	}
+
+	if len(res.NodeAddresses) != 1 || res.NodeAddresses[0] != "127.0.0.1:5000" {
+		t.Fatalf("Expected node address 127.0.0.1:5000, got %v", res.NodeAddresses)
+	}
+}
