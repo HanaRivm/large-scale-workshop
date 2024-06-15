@@ -9,7 +9,7 @@ import (
 	"time"
 
 	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
-	dht "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/servant/dht"
+	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/servant/dht"
 	testserviceclient "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	"gopkg.in/yaml.v2"
 
