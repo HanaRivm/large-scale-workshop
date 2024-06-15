@@ -45,7 +45,7 @@ func TestTestServiceClient(t *testing.T) {
 		"127.0.0.1:8503",
 	}
 
-	clientBase, err := getClient(registryAddresses)
+	clientBase, err := getClient(registryAddresses[0])
 	if err != nil {
 		t.Fatalf("Failed to connect to registry service: %v", err)
 	}
