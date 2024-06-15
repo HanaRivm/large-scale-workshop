@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	RegistryServiceClient "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/client"
@@ -33,15 +32,12 @@ func Start(serviceName string, grpcListenPort int, bindgRPCToService func(s grpc
 }
 
 func RegisterAddress(serviceName string, registryAddresses []string, listeningAddress string) (unregister func()) {
-	registryClient := RegistryServiceClient.NewRegistryServiceClient(registryAddresses)
-	log.Printf("Registering service: %s at address: %s with registry: %v", serviceName, listeningAddress, registryAddresses)
 
+	registryClient := RegistryServiceClient.NewRegistryServiceClient(registryAddresses)
 	err := registryClient.Register(serviceName, listeningAddress)
 	if err != nil {
 		Logger.Fatalf("Failed to register to registry service: %v", err)
 	}
-	log.Printf("Successfully registered service: %s at address: %s", serviceName, listeningAddress)
-
 	return func() {
 		registryClient.Unregister(serviceName, listeningAddress)
 	}
