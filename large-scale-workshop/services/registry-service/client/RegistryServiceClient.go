@@ -8,6 +8,8 @@ import (
 	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type RegistryServiceClient struct {
@@ -55,4 +57,8 @@ func (c *RegistryServiceClient) Close() {
 	if err := c.conn.Close(); err != nil {
 		log.Printf("Error closing connection: %v", err)
 	}
+}
+
+func (s *RegistryServiceClient) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
+	return &wrapperspb.BoolValue{Value: true}, nil
 }

@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type registryServer struct {
@@ -55,30 +54,31 @@ func (s *registryServer) Discover(ctx context.Context, req *pb.DiscoverRequest) 
 	return &pb.DiscoverResponse{NodeAddresses: nodes}, nil
 }
 
-func (s *registryServer) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrapperspb.BoolValue, error) {
-	return &wrapperspb.BoolValue{Value: true}, nil
-}
-
 func (s *registryServer) startHealthCheck() {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		s.mu.Lock()
-		for serviceName, nodes := range s.services {
+		for _, nodes := range s.services {
 			for _, node := range nodes {
-				conn, err := grpc.Dial(node, grpc.WithInsecure())
+				conn, err := grpc.Dial(node, grpc.WithInsecure(), grpc.WithBlock())
 				if err != nil {
 					continue
 				}
 				client := pb.NewRegistryServiceClient(conn)
 				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 				defer cancel()
-				res, err := client.IsAlive(ctx, &pb.IsAliveRequest{NodeAddress: node})
-				if err != nil || !res.Alive {
-					log.Printf("Node %s is not responding, removing from registry", node)
-					s.services[serviceName] = removeNode(s.services[serviceName], node)
+				res, err := client.IsAlive(ctx, &emptypb.Empty{})
+				if err != nil {
+					log.Printf("error is not nil")
 				}
+				log.Printf(res.String())
+				//|| !res.Value {
+				//
+				//	log.Printf("Node %s is not responding, removing from registry", node)
+				//	s.services[serviceName] = removeNode(s.services[serviceName], node)
+				//}
 				conn.Close()
 			}
 		}
