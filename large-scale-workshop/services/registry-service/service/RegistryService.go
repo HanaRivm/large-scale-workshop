@@ -85,7 +85,7 @@ func (s *registryServer) startHealthCheck() {
 						continue
 					}
 					client := testserviceclient.NewTestServiceClient(conn)
-					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+					ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 					defer cancel()
 
 					res, err := client.IsAlive(ctx, &emptypb.Empty{})
@@ -121,7 +121,7 @@ func (s *registryServer) checkLeaderAlive() {
 		return
 	}
 	client := pb.NewRegistryServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	res, err := client.IsAlive(ctx, &emptypb.Empty{})
@@ -167,7 +167,8 @@ func RunServer(configData []byte) error {
 	if err != nil {
 		return fmt.Errorf("error unmarshaling service config: %v", err)
 	}
-	port := config.Port
+
+	var port int32 = config.Port
 	var lis net.Listener
 	for {
 		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -180,30 +181,38 @@ func RunServer(configData []byte) error {
 		}
 	}
 	server := NewRegistryServer()
-	if rootNodeName == "" {
-		server.chord, err = dht.NewChord(config.Name, port)
-		if err != nil {
-			return fmt.Errorf("failed to create Chord: %v", err)
-		}
-		rootNodeName = config.Name
-	} else {
-		server.chord, err = dht.JoinChord(config.Name, rootNodeName, port)
-		if err != nil {
-			return fmt.Errorf("failed to join Chord: %v", err)
-		}
-	}
-
-	server.isRoot, err = server.chord.IsFirst()
+	//isFirst, err := server.chord.IsFirst()
 	if err != nil {
-		return fmt.Errorf("failed to check if root: %v", err)
+		log.Fatalf("Failed to check if node is the root: %v", err)
 	}
+	//if isFirst {
+	//	server.chord, err = dht.NewChord(config.Name, port)
+	//	if err != nil {
+	//
+	//		return fmt.Errorf("failed to create Chord: %v", err)
+	//	}
+	//	rootNodeName = config.Name
+	//} else {
+	//	server.chord, err = dht.JoinChord(config.Name, rootNodeName, port)
+	//	if err != nil {
+	//		return fmt.Errorf("failed to join Chord: %v", err)
+	//	}
+	//}
+	log.Printf("finished chord")
 
-	go server.startHealthCheck()
+	//server.isRoot, err = server.chord.IsFirst()
+	//if err != nil {
+	//	return fmt.Errorf("failed to check if root: %v", err)
+	//}
+
+	//go server.startHealthCheck()
 
 	s := grpc.NewServer()
 	pb.RegisterRegistryServiceServer(s, server)
 	reflection.Register(s)
 
-	log.Printf("Registry service is running on port %d", port)
-	return s.Serve(lis)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+	return nil
 }

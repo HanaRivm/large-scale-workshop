@@ -19,51 +19,54 @@ var getAllKeys func(...interface{}) ([]interface{}, error)
 var isFirst func(...interface{}) ([]interface{}, error)
 
 func init() {
+	var err error
 	openjdkRuntime = metaffi.NewMetaFFIRuntime("openjdk")
-	chordModule, err := openjdkRuntime.LoadModule("./dht/Chord.class")
+	chordModule, err = openjdkRuntime.LoadModule("./dht/Chord.class")
+	if err != nil {
+		log.Fatalf("Failed to load Chord module: %v", err)
+	}
+
 	newChord, err = chordModule.Load("class=dht.Chord,callable=<init>",
 		[]IDL.MetaFFIType{IDL.STRING8, IDL.INT32},
 		[]IDL.MetaFFIType{IDL.HANDLE})
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to load newChord: %v", err)
 	}
+
 	joinChord, err = chordModule.Load("class=dht.Chord,callable=<init>",
 		[]IDL.MetaFFIType{IDL.STRING8, IDL.STRING8, IDL.INT32},
 		[]IDL.MetaFFIType{IDL.HANDLE})
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to load joinChord: %v", err)
 	}
-	set, err =
-		chordModule.Load("class=dht.Chord,callable=set,instance_required", []IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8, IDL.STRING8}, nil)
+
+	set, err = chordModule.Load("class=dht.Chord,callable=set,instance_required",
+		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8, IDL.STRING8}, nil)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to load set: %v", err)
 	}
-	getAllKeys, err =
-		chordModule.LoadWithAlias("class=dht.Chord,callable=getAllKeys,instance_required",
-			[]IDL.MetaFFITypeInfo{{StringType: IDL.HANDLE}},
-			[]IDL.MetaFFITypeInfo{{StringType: IDL.STRING8_ARRAY, Dimensions: 1}})
+
+	getAllKeys, err = chordModule.LoadWithAlias("class=dht.Chord,callable=getAllKeys,instance_required",
+		[]IDL.MetaFFITypeInfo{{StringType: IDL.HANDLE}},
+		[]IDL.MetaFFITypeInfo{{StringType: IDL.STRING8_ARRAY, Dimensions: 1}})
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to load getAllKeys: %v", err)
 	}
-	// Load get method
+
 	get, err = chordModule.Load("class=dht.Chord,callable=get,instance_required",
 		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8}, []IDL.MetaFFIType{IDL.STRING8})
 	if err != nil {
 		log.Fatalf("Failed to load get: %v", err)
 	}
-	// Load delete method
+
 	pdelete, err = chordModule.Load("class=dht.Chord,callable=delete,instance_required",
 		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8}, nil)
 	if err != nil {
 		log.Fatalf("Failed to load delete: %v", err)
 	}
-	chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required",
-		[]IDL.MetaFFIType{IDL.HANDLE},
-		[]IDL.MetaFFIType{IDL.BOOL})
-	if err != nil {
-		panic(err)
-	}
-	isFirst, err = chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required", []IDL.MetaFFIType{IDL.HANDLE}, []IDL.MetaFFIType{IDL.BOOL})
+
+	isFirst, err = chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required",
+		[]IDL.MetaFFIType{IDL.HANDLE}, []IDL.MetaFFIType{IDL.BOOL})
 	if err != nil {
 		log.Fatalf("Failed to load isFirst: %v", err)
 	}
@@ -82,6 +85,7 @@ func NewChord(name string, port int32) (*Chord, error) {
 	c.handle = h[0].(metaffiruntime.MetaFFIHandle)
 	return c, nil
 }
+
 func JoinChord(name string, rootNodeName string, port int32) (*Chord, error) {
 	h, err := joinChord(name, rootNodeName, port)
 	if err != nil {
@@ -91,6 +95,7 @@ func JoinChord(name string, rootNodeName string, port int32) (*Chord, error) {
 	c.handle = h[0].(metaffiruntime.MetaFFIHandle)
 	return c, nil
 }
+
 func (c *Chord) IsFirst() (bool, error) {
 	res, err := isFirst(c.handle)
 	if err != nil {
