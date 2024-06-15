@@ -9,7 +9,6 @@ package RegistryService
 import (
 	context "context"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,7 +23,6 @@ const (
 	RegistryService_Register_FullMethodName   = "/registryservice.RegistryService/Register"
 	RegistryService_Unregister_FullMethodName = "/registryservice.RegistryService/Unregister"
 	RegistryService_Discover_FullMethodName   = "/registryservice.RegistryService/Discover"
-	RegistryService_IsAlive_FullMethodName    = "/registryservice.RegistryService/IsAlive"
 )
 
 // RegistryServiceClient is the client API for RegistryService service.
@@ -34,7 +32,6 @@ type RegistryServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	Unregister(ctx context.Context, in *UnregisterRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	Discover(ctx context.Context, in *DiscoverRequest, opts ...grpc.CallOption) (*DiscoverResponse, error)
-	IsAlive(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*wrappers.BoolValue, error)
 }
 
 type registryServiceClient struct {
@@ -72,15 +69,6 @@ func (c *registryServiceClient) Discover(ctx context.Context, in *DiscoverReques
 	return out, nil
 }
 
-func (c *registryServiceClient) IsAlive(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*wrappers.BoolValue, error) {
-	out := new(wrappers.BoolValue)
-	err := c.cc.Invoke(ctx, RegistryService_IsAlive_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // RegistryServiceServer is the server API for RegistryService service.
 // All implementations must embed UnimplementedRegistryServiceServer
 // for forward compatibility
@@ -88,7 +76,6 @@ type RegistryServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*empty.Empty, error)
 	Unregister(context.Context, *UnregisterRequest) (*empty.Empty, error)
 	Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error)
-	IsAlive(context.Context, *empty.Empty) (*wrappers.BoolValue, error)
 	mustEmbedUnimplementedRegistryServiceServer()
 }
 
@@ -104,9 +91,6 @@ func (UnimplementedRegistryServiceServer) Unregister(context.Context, *Unregiste
 }
 func (UnimplementedRegistryServiceServer) Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Discover not implemented")
-}
-func (UnimplementedRegistryServiceServer) IsAlive(context.Context, *empty.Empty) (*wrappers.BoolValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAlive not implemented")
 }
 func (UnimplementedRegistryServiceServer) mustEmbedUnimplementedRegistryServiceServer() {}
 
@@ -175,24 +159,6 @@ func _RegistryService_Discover_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RegistryService_IsAlive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RegistryServiceServer).IsAlive(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RegistryService_IsAlive_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RegistryServiceServer).IsAlive(ctx, req.(*empty.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // RegistryService_ServiceDesc is the grpc.ServiceDesc for RegistryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -211,10 +177,6 @@ var RegistryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Discover",
 			Handler:    _RegistryService_Discover_Handler,
-		},
-		{
-			MethodName: "IsAlive",
-			Handler:    _RegistryService_IsAlive_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

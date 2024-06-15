@@ -12,7 +12,6 @@ service RegistryService {
     rpc Register(RegisterRequest) returns (google.protobuf.Empty);
     rpc Unregister(UnregisterRequest) returns (google.protobuf.Empty);
     rpc Discover(DiscoverRequest) returns (DiscoverResponse);
-    rpc IsAlive(google.protobuf.Empty) returns (google.protobuf.BoolValue); 
 }
 
 message DiscoverRequest {

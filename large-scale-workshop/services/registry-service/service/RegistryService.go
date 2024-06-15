@@ -2,6 +2,7 @@ package RegistryService
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"sync"
@@ -72,6 +73,7 @@ func (s *registryServer) startHealthCheck() {
 				res, err := client.IsAlive(ctx, &emptypb.Empty{})
 				if err != nil {
 					log.Printf("error is not nil")
+					fmt.Println("Error:", err)
 				}
 				log.Printf(res.String())
 				//|| !res.Value {
