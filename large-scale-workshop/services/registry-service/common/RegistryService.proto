@@ -10,7 +10,7 @@ service RegistryService {
     rpc Register(RegisterRequest) returns (google.protobuf.Empty);
     rpc Unregister(UnregisterRequest) returns (google.protobuf.Empty);
     rpc Discover(DiscoverRequest) returns (DiscoverResponse);
-    rpc IsAlive(IsAliveRequest) returns (IsAliveResponse);
+    rpc IsAlive(google.protobuf.Empty) returns (google.protobuf.BoolValue); 
 }
 
 message DiscoverRequest {
@@ -29,12 +29,4 @@ message UnregisterRequest {
 
 message DiscoverResponse {
     repeated string node_addresses = 1;
-}
-
-message IsAliveRequest {
-    string node_address = 1;
-}
-
-message IsAliveResponse {
-    bool alive = 1;
 }
