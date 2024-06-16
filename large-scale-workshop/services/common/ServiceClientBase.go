@@ -20,7 +20,7 @@ func (obj *ServiceClientBase[client_t]) PickNode() string {
 }
 
 func (obj *ServiceClientBase[client_t]) Connect() (res client_t, closeFunc func(), err error) {
-	registryAddress := obj.pickNode()
+	registryAddress := obj.PickNode()
 	log.Printf("picking node%s", registryAddress)
 	conn, err := grpc.Dial(registryAddress, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(time.Minute))
 	if err != nil {
