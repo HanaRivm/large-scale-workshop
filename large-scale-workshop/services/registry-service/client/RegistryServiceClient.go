@@ -3,10 +3,10 @@ package RegistryServiceClient
 import (
 	"context"
 	"log"
+	"math/rand"
 	"time"
 
 	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
-
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -17,8 +17,13 @@ type RegistryServiceClient struct {
 	conn   *grpc.ClientConn
 }
 
+func pickNode(addresses []string) string {
+	rand.Seed(time.Now().UnixNano())
+	return addresses[rand.Intn(len(addresses))]
+}
 func NewRegistryServiceClient(addresses []string) *RegistryServiceClient {
-	conn, err := grpc.Dial(addresses[0], grpc.WithInsecure(), grpc.WithBlock())
+	address := pickNode(addresses)
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil
 	}
