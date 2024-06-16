@@ -26,7 +26,7 @@ var cache *CacheService.CacheService
 
 func init() {
 	var err error
-	cache, err = CacheService.NewCacheService("TestServiceNode", 1099, "")
+	cache, err = CacheService.NewCacheService("TestServiceNode", 1100, "")
 	if err != nil {
 		log.Fatalf("Failed to initialize cache service: %v", err)
 	}
