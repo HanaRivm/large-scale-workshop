@@ -2,7 +2,6 @@ package test
 
 import (
 	"testing"
-	"time"
 
 	service "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/cache-service/service"
 	"github.com/stretchr/testify/assert"
@@ -21,8 +20,8 @@ func TestCacheService(t *testing.T) {
 	value, err = cs.Get("key1")
 	assert.Error(t, err)
 
-	cs.Set("key2", "value2", 1*time.Second)
-	time.Sleep(2 * time.Second)
+	cs.Set("key2", "value2")
 	value, err = cs.Get("key2")
-	assert.Error(t, err)
+	assert.Equal(t, "value2", value)
+
 }
