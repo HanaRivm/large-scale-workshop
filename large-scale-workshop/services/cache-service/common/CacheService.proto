@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "CacheService"; 
+
+package cacheservice;
+
+import "google/protobuf/empty.proto"; 
+import "google/protobuf/wrappers.proto"; 
+
+service CacheService {
+  rpc Set (SetRequest) returns (google.protobuf.Empty);
+  rpc Get (GetRequest) returns (GetResponse);
+  rpc Delete (DeleteRequest) returns (google.protobuf.Empty);
+  rpc IsAlive (google.protobuf.Empty) returns (google.protobuf.BoolValue);
+}
+
+message SetRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  string value = 1;
+}
+
+message DeleteRequest {
+  string key = 1;
+}

@@ -2,14 +2,17 @@ package CacheService
 
 import (
 	"log"
-	"sync"
 
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/servant/dht"
 )
 
-type CacheService struct {
-	chord *dht.Chord
-	mu    sync.Mutex
+type CacheServiceServer struct {
+	UnimplementedCacheServiceServer
+	chord dht.Chord
+}
+
+func NewCacheServiceServer() *CacheServiceServer {
+	return &CacheServiceServer{}
 }
 
 func NewCacheService(nodeName string, port int32, rootNodeName string) (*CacheService, error) {

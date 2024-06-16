@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 
-	CacheService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/cache-service/service"
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
@@ -22,15 +21,15 @@ type testServiceImplementation struct {
 	UnimplementedTestServiceServer
 }
 
-var cache *CacheService.CacheService
-
-func init() {
-	var err error
-	cache, err = CacheService.NewCacheService("TestServiceNode", 1100, "")
-	if err != nil {
-		log.Fatalf("Failed to initialize cache service: %v", err)
-	}
-}
+//var cache *CacheService.CacheService
+//
+//func init() {
+//	var err error
+//	cache, err = CacheService.NewCacheService("TestServiceNode", 1100, "")
+//	if err != nil {
+//		log.Fatalf("Failed to initialize cache service: %v", err)
+//	}
+//}
 
 func (obj *testServiceImplementation) HelloWorld(ctx context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {
 	return wrapperspb.String(TestServiceServant.HelloWorld()), nil
