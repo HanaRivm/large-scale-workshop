@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 
+	CacheService "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/cache-service/service"
 	services "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/common"
 	. "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	TestServiceServant "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/servant"
@@ -21,6 +22,16 @@ type testServiceImplementation struct {
 	UnimplementedTestServiceServer
 }
 
+var cache *CacheService.CacheService
+
+func init() {
+	var err error
+	cache, err = CacheService.NewCacheService("TestServiceNode", 1099, "")
+	if err != nil {
+		log.Fatalf("Failed to initialize cache service: %v", err)
+	}
+}
+
 func (obj *testServiceImplementation) HelloWorld(ctx context.Context, _ *emptypb.Empty) (res *wrapperspb.StringValue, err error) {
 	return wrapperspb.String(TestServiceServant.HelloWorld()), nil
 }
@@ -33,14 +44,14 @@ func (obj *testServiceImplementation) HelloToUser(ctx context.Context, req *wrap
 
 func (obj *testServiceImplementation) Store(ctx context.Context, req *StoreKeyValue) (*emptypb.Empty, error) {
 	log.Printf("Store called with key: %s, value: %s", req.Key, req.Value)
-	TestServiceServant.Store(req.Key, req.Value)
+	cache.Set(req.Key, req.Value)
 	return &emptypb.Empty{}, nil
 }
 
 func (obj *testServiceImplementation) Get(ctx context.Context, req *wrapperspb.StringValue) (*wrapperspb.StringValue, error) {
 	log.Println("Get called with key:", req.GetValue())
-	value, exists := TestServiceServant.Get(req.Value)
-	if !exists {
+	value, err := cache.Get(req.Value)
+	if err != nil {
 		return nil, fmt.Errorf("key not found: %s", req.Value)
 	}
 	return wrapperspb.String(value), nil
