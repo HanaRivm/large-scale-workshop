@@ -14,7 +14,7 @@ type ServiceClientBase[client_t any] struct {
 	CreateClient      func(grpc.ClientConnInterface) client_t
 }
 
-func (obj *ServiceClientBase[client_t]) pickNode() string {
+func (obj *ServiceClientBase[client_t]) PickNode() string {
 	rand.Seed(time.Now().UnixNano())
 	return obj.RegistryAddresses[rand.Intn(len(obj.RegistryAddresses))]
 }

@@ -13,13 +13,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-)
-
-var (
-	chordPort int32 = 1099
 )
 
 type registryServer struct {
@@ -41,7 +38,6 @@ func (s *registryServer) Register(ctx context.Context, req *pb.RegisterRequest) 
 	log.Printf("Attempting to register service: %s at address: %s", req.ServiceName, req.NodeAddress)
 	s.services[req.ServiceName] = append(s.services[req.ServiceName], req.NodeAddress)
 	log.Printf("Successfully registered service: %s at address: %s", req.ServiceName, req.NodeAddress)
-	s.chord.Set(req.ServiceName, req.NodeAddress)
 	return &emptypb.Empty{}, nil
 }
 
@@ -55,7 +51,6 @@ func (s *registryServer) Unregister(ctx context.Context, req *pb.UnregisterReque
 			break
 		}
 	}
-	s.chord.Delete(req.ServiceName)
 	return &emptypb.Empty{}, nil
 }
 
@@ -75,54 +70,38 @@ func (s *registryServer) IsAlive(ctx context.Context, req *emptypb.Empty) (*wrap
 func (s *registryServer) startHealthCheck() {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
-
 	for range ticker.C {
 		s.mu.Lock()
-		isRoot, err := s.chord.IsFirst()
-		if err != nil {
-			log.Printf("Error checking if root node: %v", err)
-			s.mu.Unlock()
-			continue
+		// Copy the map to avoid concurrent access issues
+		nodes := make(map[string][]string, len(s.services))
+		for k, v := range s.services {
+			nodes[k] = append([]string{}, v...) // Deep copy of the value slice
 		}
-		if isRoot {
-			for serviceName, nodes := range s.services {
-				for _, node := range nodes {
-					conn, err := grpc.Dial(node, grpc.WithInsecure())
-					if err != nil {
-						continue
-					}
-					client := pb.NewRegistryServiceClient(conn)
-					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-					defer cancel()
-					res, err := client.IsAlive(ctx, &emptypb.Empty{})
-					if err != nil || !res.Value {
-						log.Printf("Node %s is not responding, removing from registry", node)
-						s.services[serviceName] = removeNode(s.services[serviceName], node)
-					}
-					conn.Close()
+		s.mu.Unlock()
+		// Now safely iterate over the copied map
+		for serviceName, nodeList := range nodes {
+			for _, node := range nodeList {
+				conn, err := grpc.Dial(node, grpc.WithTransportCredentials(insecure.NewCredentials()))
+				if err != nil {
+					log.Printf("Error dialing node %s: %v", node, err)
+					continue
+				}
+				defer conn.Close()
+				client := pb.NewRegistryServiceClient(conn)
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				res, err := client.IsAlive(ctx, &emptypb.Empty{})
+				if err != nil || !res.Value {
+					log.Printf("Node %s is not responding, removing from registry", node)
+					// Consider using a separate goroutine for removing unhealthy nodes
+					// to avoid blocking the health check loop
+					s.mu.Lock()
+					s.services[serviceName] = removeNode(s.services[serviceName], node)
+					s.mu.Unlock()
 				}
 			}
 		}
-		s.mu.Unlock()
 	}
-}
-
-func (s *registryServer) checkLeaderAlive(rootName string) {
-	leaderAddress := rootName
-	conn, err := grpc.Dial(leaderAddress, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		log.Printf("Failed to connect to leader node %s: %v", leaderAddress, err)
-		return
-	}
-	client := pb.NewRegistryServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	res, err := client.IsAlive(ctx, &emptypb.Empty{})
-	if err != nil || !res.Value {
-		log.Printf("Leader node %s is not responding: %v", leaderAddress, err)
-	}
-	conn.Close()
 }
 
 func removeNode(nodes []string, node string) []string {
@@ -160,6 +139,8 @@ func RunServer(configData []byte) error {
 
 	defer lis.Close()
 	var rootName = config.RootName
+	var chordPort int32
+	chordPort = 1099
 	server := NewRegistryServer()
 	if rootName == "" {
 		newchord, err := dht.NewChord(config.Name, chordPort)
@@ -176,7 +157,7 @@ func RunServer(configData []byte) error {
 		}
 	}
 
-	go server.startHealthCheck()
+	//go server.startHealthCheck()
 
 	s := grpc.NewServer()
 	pb.RegisterRegistryServiceServer(s, server)
