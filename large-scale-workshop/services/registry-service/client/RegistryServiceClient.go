@@ -27,7 +27,7 @@ func NewRegistryServiceClient(addresses []string) *RegistryServiceClient {
 }
 
 func (c *RegistryServiceClient) Register(serviceName, nodeAddress string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	_, err := c.client.Register(ctx, &service.RegisterRequest{ServiceName: serviceName, NodeAddress: nodeAddress})
@@ -35,7 +35,7 @@ func (c *RegistryServiceClient) Register(serviceName, nodeAddress string) error 
 }
 
 func (c *RegistryServiceClient) Unregister(serviceName, nodeAddress string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	_, err := c.client.Unregister(ctx, &service.UnregisterRequest{ServiceName: serviceName, NodeAddress: nodeAddress})

@@ -1,0 +1,4 @@
+type: "RegistryService"
+name: server2
+port: 8502
+rootName: server1

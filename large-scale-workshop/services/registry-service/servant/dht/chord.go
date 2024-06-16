@@ -30,45 +30,48 @@ func init() {
 		[]IDL.MetaFFIType{IDL.STRING8, IDL.INT32},
 		[]IDL.MetaFFIType{IDL.HANDLE})
 	if err != nil {
-		log.Fatalf("Failed to load newChord: %v", err)
+		panic(err)
 	}
 
 	joinChord, err = chordModule.Load("class=dht.Chord,callable=<init>",
 		[]IDL.MetaFFIType{IDL.STRING8, IDL.STRING8, IDL.INT32},
 		[]IDL.MetaFFIType{IDL.HANDLE})
 	if err != nil {
-		log.Fatalf("Failed to load joinChord: %v", err)
+		panic(err)
 	}
 
 	set, err = chordModule.Load("class=dht.Chord,callable=set,instance_required",
 		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8, IDL.STRING8}, nil)
 	if err != nil {
-		log.Fatalf("Failed to load set: %v", err)
+		panic(err)
 	}
 
-	getAllKeys, err = chordModule.LoadWithAlias("class=dht.Chord,callable=getAllKeys,instance_required",
-		[]IDL.MetaFFITypeInfo{{StringType: IDL.HANDLE}},
-		[]IDL.MetaFFITypeInfo{{StringType: IDL.STRING8_ARRAY, Dimensions: 1}})
+	getAllKeys, err =
+		chordModule.LoadWithAlias("class=dht.Chord,callable=getAllKeys,instance_required",
+			[]IDL.MetaFFITypeInfo{{StringType: IDL.HANDLE}},
+			[]IDL.MetaFFITypeInfo{{StringType: IDL.STRING8_ARRAY, Dimensions: 1}})
 	if err != nil {
-		log.Fatalf("Failed to load getAllKeys: %v", err)
+		panic(err)
 	}
 
 	get, err = chordModule.Load("class=dht.Chord,callable=get,instance_required",
 		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8}, []IDL.MetaFFIType{IDL.STRING8})
 	if err != nil {
-		log.Fatalf("Failed to load get: %v", err)
+		panic(err)
 	}
 
 	pdelete, err = chordModule.Load("class=dht.Chord,callable=delete,instance_required",
 		[]IDL.MetaFFIType{IDL.HANDLE, IDL.STRING8}, nil)
 	if err != nil {
-		log.Fatalf("Failed to load delete: %v", err)
+		panic(err)
 	}
 
-	isFirst, err = chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required",
-		[]IDL.MetaFFIType{IDL.HANDLE}, []IDL.MetaFFIType{IDL.BOOL})
+	isFirst, err =
+		chordModule.Load("class=dht.Chord,field=isFirst,getter,instance_required",
+			[]IDL.MetaFFIType{IDL.HANDLE},
+			[]IDL.MetaFFIType{IDL.BOOL})
 	if err != nil {
-		log.Fatalf("Failed to load isFirst: %v", err)
+		panic(err)
 	}
 }
 

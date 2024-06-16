@@ -1,3 +1,4 @@
-type: RegistryService
+type: "RegistryService"
 name: server1
 port: 8502
+rootName: ""

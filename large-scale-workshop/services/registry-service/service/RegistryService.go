@@ -10,7 +10,6 @@ import (
 
 	pb "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/common"
 	"github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/registry-service/servant/dht"
-	testserviceclient "github.com/TAULargeScaleWorkshop/HANA/large-scale-workshop/services/test-service/common"
 	"gopkg.in/yaml.v2"
 
 	"google.golang.org/grpc"
@@ -19,15 +18,16 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+var (
+	chordPort int32 = 1099
+)
+
 type registryServer struct {
 	pb.UnimplementedRegistryServiceServer
 	mu       sync.Mutex
 	services map[string][]string
 	chord    *dht.Chord
-	isRoot   bool
 }
-
-var rootNodeName string
 
 func NewRegistryServer() *registryServer {
 	return &registryServer{
@@ -41,6 +41,7 @@ func (s *registryServer) Register(ctx context.Context, req *pb.RegisterRequest) 
 	log.Printf("Attempting to register service: %s at address: %s", req.ServiceName, req.NodeAddress)
 	s.services[req.ServiceName] = append(s.services[req.ServiceName], req.NodeAddress)
 	log.Printf("Successfully registered service: %s at address: %s", req.ServiceName, req.NodeAddress)
+	s.chord.Set(req.ServiceName, req.NodeAddress)
 	return &emptypb.Empty{}, nil
 }
 
@@ -54,6 +55,7 @@ func (s *registryServer) Unregister(ctx context.Context, req *pb.UnregisterReque
 			break
 		}
 	}
+	s.chord.Delete(req.ServiceName)
 	return &emptypb.Empty{}, nil
 }
 
@@ -75,49 +77,41 @@ func (s *registryServer) startHealthCheck() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		if s.isRoot {
-			s.mu.Lock()
+		s.mu.Lock()
+		isRoot, err := s.chord.IsFirst()
+		if err != nil {
+			log.Printf("Error checking if root node: %v", err)
+			s.mu.Unlock()
+			continue
+		}
+		if isRoot {
 			for serviceName, nodes := range s.services {
 				for _, node := range nodes {
-					conn, err := grpc.Dial(node, grpc.WithInsecure(), grpc.WithBlock())
+					conn, err := grpc.Dial(node, grpc.WithInsecure())
 					if err != nil {
-						log.Printf("Failed to connect to node %s: %v", node, err)
 						continue
 					}
-					client := testserviceclient.NewTestServiceClient(conn)
-					ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+					client := pb.NewRegistryServiceClient(conn)
+					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 					defer cancel()
-
 					res, err := client.IsAlive(ctx, &emptypb.Empty{})
-					if err != nil {
+					if err != nil || !res.Value {
+						log.Printf("Node %s is not responding, removing from registry", node)
 						s.services[serviceName] = removeNode(s.services[serviceName], node)
-					} else {
-						if !res.Value {
-							log.Printf("Node %s is not responding, removing from registry", node)
-							s.services[serviceName] = removeNode(s.services[serviceName], node)
-						}
 					}
 					conn.Close()
 				}
 			}
-			s.mu.Unlock()
-		} else {
-			s.checkLeaderAlive()
 		}
+		s.mu.Unlock()
 	}
 }
 
-func (s *registryServer) checkLeaderAlive() {
-	leaderAddress, err := s.chord.Get("leader")
-	if err != nil {
-		log.Printf("Failed to get leader address: %v", err)
-		s.triggerLeaderElection()
-		return
-	}
+func (s *registryServer) checkLeaderAlive(rootName string) {
+	leaderAddress := rootName
 	conn, err := grpc.Dial(leaderAddress, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Printf("Failed to connect to leader node %s: %v", leaderAddress, err)
-		s.triggerLeaderElection()
 		return
 	}
 	client := pb.NewRegistryServiceClient(conn)
@@ -127,25 +121,8 @@ func (s *registryServer) checkLeaderAlive() {
 	res, err := client.IsAlive(ctx, &emptypb.Empty{})
 	if err != nil || !res.Value {
 		log.Printf("Leader node %s is not responding: %v", leaderAddress, err)
-		s.triggerLeaderElection()
 	}
 	conn.Close()
-}
-
-func (s *registryServer) triggerLeaderElection() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if len(s.services) > 0 {
-		for _, nodes := range s.services {
-			if len(nodes) > 0 {
-				leaderAddress := nodes[0]
-				log.Printf("New leader elected: %s", leaderAddress)
-				s.isRoot = true
-				s.chord.Set("leader", leaderAddress)
-				break
-			}
-		}
-	}
 }
 
 func removeNode(nodes []string, node string) []string {
@@ -159,8 +136,9 @@ func removeNode(nodes []string, node string) []string {
 
 func RunServer(configData []byte) error {
 	var config struct {
-		Port int32  `yaml:"port"`
-		Name string `yaml:"name"`
+		Port     int32  `yaml:"port"`
+		Name     string `yaml:"name"`
+		RootName string `yaml:"rootName"`
 	}
 
 	err := yaml.Unmarshal(configData, &config)
@@ -168,49 +146,43 @@ func RunServer(configData []byte) error {
 		return fmt.Errorf("error unmarshaling service config: %v", err)
 	}
 
-	var port int32 = config.Port
+	port := config.Port
 	var lis net.Listener
 	for {
 		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
-			log.Println(err.Error())
 			log.Printf("Port %d in use, trying next port", port)
 			port++
 		} else {
 			break
 		}
 	}
+
+	defer lis.Close()
+	var rootName = config.RootName
 	server := NewRegistryServer()
-	//isFirst, err := server.chord.IsFirst()
-	if err != nil {
-		log.Fatalf("Failed to check if node is the root: %v", err)
+	if rootName == "" {
+		newchord, err := dht.NewChord(config.Name, chordPort)
+		server.chord = newchord
+		log.Println("created chord")
+		if err != nil {
+			return fmt.Errorf("failed to create Chord: %v", err)
+		}
+
+	} else {
+		server.chord, err = dht.JoinChord(config.Name, rootName, chordPort)
+		if err != nil {
+			return fmt.Errorf("failed to join Chord: %v", err)
+		}
 	}
-	//if isFirst {
-	//	server.chord, err = dht.NewChord(config.Name, port)
-	//	if err != nil {
-	//
-	//		return fmt.Errorf("failed to create Chord: %v", err)
-	//	}
-	//	rootNodeName = config.Name
-	//} else {
-	//	server.chord, err = dht.JoinChord(config.Name, rootNodeName, port)
-	//	if err != nil {
-	//		return fmt.Errorf("failed to join Chord: %v", err)
-	//	}
-	//}
-	log.Printf("finished chord")
 
-	//server.isRoot, err = server.chord.IsFirst()
-	//if err != nil {
-	//	return fmt.Errorf("failed to check if root: %v", err)
-	//}
-
-	//go server.startHealthCheck()
+	go server.startHealthCheck()
 
 	s := grpc.NewServer()
 	pb.RegisterRegistryServiceServer(s, server)
 	reflection.Register(s)
 
+	log.Printf("Registry service is running on port %d", port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}

@@ -5,10 +5,17 @@ import (
 )
 
 func TestChord(t *testing.T) {
-	chord, err := NewChord("node1", 1099)
+	var port int32 = 1099
+	chord, err := NewChord("node1", port)
 	if err != nil {
 		t.Fatalf("Failed to create new Chord: %v", err)
 	}
+	println(chord.IsFirst())
+	chord2, err := JoinChord("node2", "node1", port)
+	if err != nil {
+		t.Fatalf("Failed to join Chord: %v", err)
+	}
+	println(chord.IsFirst())
 
 	// Test Set
 	err = chord.Set("key1", "value1")
@@ -17,7 +24,7 @@ func TestChord(t *testing.T) {
 	}
 
 	// Test Get
-	value, err := chord.Get("key1")
+	value, err := chord2.Get("key1")
 	if err != nil {
 		t.Fatalf("Failed to get key: %v", err)
 	}
